@@ -117,7 +117,7 @@ function renderLanes(s) {
 	var p = s.proc || '', dl = perLane(row(p, 'dlreap')), ul = perLane(row(p, 'ulreap')),
 	    names = laneNames(), dt = prev ? (s.t - prev.t) / 1000 : 0, rows = [];
 
-	var hdr = [ _('Lane'), _('AP'), _('DL frames'), _('DL rate'), _('In flight'), _('CoDel drops'),
+	var hdr = [ _('Lane'), _('AP'), _('DL frames'), _('DL rate'), _('In flight'), _('Cap'), _('CoDel drops'),
 	            _('TCL full'), _('TX errors'), _('UL frames'), _('UL rate'), _('UL to host') ];
 
 	for (var i = 0; i < Math.max(dl.length, ul.length); i++) {
@@ -127,7 +127,7 @@ function renderLanes(s) {
 		var dr = prev && dt > 0 ? (num(d.completed) - (prev.dl[i] || 0)) / dt : null,
 		    ur = prev && dt > 0 ? (num(u.reaped) - (prev.ul[i] || 0)) / dt : null;
 		rows.push([ String(i), names[i] || '–', String(num(d.completed)), fmtRate(dr),
-		            String(num(d.inflight)), String(num(d.codel)), String(num(d.tclfull)),
+		            String(num(d.inflight)), d.cap != null ? String(num(d.cap)) : '–', String(num(d.codel)), String(num(d.tclfull)),
 		            String(num(d.wbmerr)), String(num(u.reaped)), fmtRate(ur), String(num(u.exc)) ]);
 	}
 

@@ -10,7 +10,7 @@ Adds **Network → NSS WiFi Offload** with two pages:
 * **Status** (auto-refresh, 2 s): offload armed or not, firmware liveness (heartbeat),
   host/firmware ABI match, firmware build features (e.g. CoDel), WiFi RX-ring ownership,
   downlink steer, and a per-lane table – downlink / uplink frames and live rates, frames
-  in flight, CoDel drops, TCL-full stops, TX errors, exceptions to the host – plus the
+  in flight and the live in-flight cap, CoDel drops, TCL-full stops, TX errors, exceptions to the host – plus the
   `nss-offload` service's log. Read from `/proc/nss_ul` (nss-peek), the ath11k / qca_ppe
   module parameters and `logread`.
 * **Settings** (`/etc/config/nss`, section `offload`): enable, firmware image, WiFi
