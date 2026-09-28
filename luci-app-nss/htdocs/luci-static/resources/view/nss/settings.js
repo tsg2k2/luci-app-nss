@@ -58,6 +58,9 @@ return view.extend({
 		var lanes = uci.get('nss', 'offload', 'lanes') || '';
 		var nlanes = parseInt(getArg(lanes, 'lanes') || '0', 10) || 0;
 		var ifaces = laneIfaces(uci.get('nss', 'offload', 'vif_rings'));
+		(getArg(lanes, 'lanevif') || '').split(',').forEach(function(n, i) {	/* the binding itself wins */
+			if (n && n != '-') ifaces[i] = n;
+		});
 		var m, s, o;
 
 		m = new form.Map('nss', _('NSS WiFi Offload – Settings'),

@@ -56,11 +56,14 @@ function readFile(p) {
 
 /* lane index -> AP interface name, from nss.offload.vif_rings ("phy0-ap0=0,phy1-ap0=1,...") */
 function laneNames() {
-	var map = {}, v = uci.get('nss', 'offload', 'vif_rings') || '';
+	var map = {}, v = uci.get('nss', 'offload', 'vif_rings') || '',
+	    m = /(?:^|\s)lanevif=(\S*)/.exec(uci.get('nss', 'offload', 'lanes') || '');
 	v.split(',').forEach(function(p) {
 		var kvp = p.split('=');
 		if (kvp.length == 2 && kvp[0]) map[+kvp[1]] = kvp[0];
 	});
+	if (m)	/* the lane binding itself (nss-peek lanevif=) wins over the steer map */
+		m[1].split(',').forEach(function(n, i) { if (n && n != '-') map[i] = n; });
 	return map;
 }
 
