@@ -1,0 +1,20 @@
+{
+	"luci-app-nss": {
+		"description": "Grant access to the NSS WiFi offload settings and status",
+		"read": {
+			"file": {
+				"/proc/nss_ul": [ "read" ],
+				"/sys/module/ath11k/parameters/ath11k_nss_offload": [ "read" ],
+				"/sys/module/ath11k/parameters/ath11k_nss_dev_mask": [ "read" ],
+				"/sys/module/qca_ppe/parameters/*": [ "read" ],
+				"/sys/kernel/debug/3a000000.ppe/offload": [ "read" ],
+				"/lib/firmware": [ "list" ],
+				"/sbin/logread -e nss-offload": [ "exec" ]
+			},
+			"uci": [ "nss", "firewall" ]
+		},
+		"write": {
+			"uci": [ "nss" ]
+		}
+	}
+}
