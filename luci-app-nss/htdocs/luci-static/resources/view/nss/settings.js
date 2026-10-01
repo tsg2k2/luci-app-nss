@@ -92,6 +92,13 @@ return view.extend({
 			_('Let the packet engine install flow entries for WiFi traffic, so the firmware forwards it without the host (the fast path).'));
 		o.rmempty = false;
 
+		o = s.taboption('general', form.Flag, 'lane_fallback', _('Automatic fallback on a stalled lane'),
+			_('A watchdog always checks every firmware lane: one that stops making progress is logged and flagged on the Status page. ' +
+			  'Ticked, the router also falls back on its own to the stock WiFi datapath until the next reboot. ' +
+			  'Leave it off while testing, so a stall is noticed and can be reported. This setting applies immediately.'));
+		o.rmempty = false;
+		o.default = '0';
+
 		o = s.taboption('general', form.Value, 'ap_wait', _('AP wait (s)'),
 			_('How long to wait at boot for every radio\'s access point before giving up and staying on stock WiFi. 5 GHz DFS channels need ~60 s.'));
 		o.datatype = 'range(30,1200)';

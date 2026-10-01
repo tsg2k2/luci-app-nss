@@ -92,7 +92,19 @@ function renderOverview(s) {
 	if (raw & 0x02) feats.push(_('per-lane TID'));
 	if (raw & 0x04) feats.push('DIAG');
 
+	/* lane watchdog: "lanewd fallback=on|off state=none|revoked|... events=N core=ok|FROZEN li0=ok:ms:queued ..." */
+	var wdl = row(p, 'lanewd'), wd = kv(wdl || ''), names = laneNames(), stalled = [];
+	Object.keys(wd).forEach(function(k) {
+		var m = /^li(\d+)$/.exec(k);
+		if (m && /^STALLED/.test(wd[k]))
+			stalled.push(names[+m[1]] ? '%s (lane %d)'.format(names[+m[1]], +m[1]) : _('lane %d').format(+m[1]));
+	});
+	var revoked = wd.state == 'revoked', wdok = !stalled.length && !revoked;
+
 	var rows = [
+		[ _('Lane watchdog'), wdl == null ? '–' : badge(wdok,
+			_('ok – automatic fallback %s').format(wd.fallback == 'on' ? _('on') : _('off')),
+			revoked ? _('fell back to stock WiFi') : _('STALLED: %s').format(stalled.join(', '))) ],
 		[ _('Offload'), s.offload == null ? _('not available (non-NSS build)') :
 			badge(s.offload == 'Y', _('armed'), _('off (stock WiFi)')) ],
 		[ _('Firmware alive'), !s.proc ? '–' : live == null ? _('checking…') :
@@ -108,12 +120,25 @@ function renderOverview(s) {
 		[ _('Exceptions to host'), exc.head != null ? _('%d (to the host stack: handshakes, unknown flows)').format(num(exc.head)) : '–' ]
 	];
 
-	return E('table', { 'class': 'table' }, rows.map(function(r) {
+	var table = E('table', { 'class': 'table' }, rows.map(function(r) {
 		return E('tr', { 'class': 'tr' }, [
 			E('td', { 'class': 'td left', 'width': '33%' }, r[0]),
 			E('td', { 'class': 'td left' }, r[1])
 		]);
 	}));
+	if (wdok)
+		return table;
+
+	var msg = revoked ?
+		_('A firmware lane stopped making progress and the router fell back to the stock WiFi datapath until the next reboot. ' +
+		  'Please report this, with the output of "logread" and "cat /proc/nss_ul".') :
+		_('A firmware lane stopped making progress: %s. The offload is still on, so WiFi through it may be degraded or dead. ' +
+		  'Please report this, with the output of "logread" and "cat /proc/nss_ul", then reboot. ' +
+		  '(Settings → "Automatic fallback on a stalled lane" makes the router recover on its own.)').format(stalled.join(', '));
+	return E('div', {}, [
+		E('div', { 'class': 'alert-message error', 'style': 'margin-bottom:1em' }, [ E('strong', {}, _('Lane watchdog: ')), msg ]),
+		table
+	]);
 }
 
 function renderLanes(s) {
